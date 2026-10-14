@@ -135,13 +135,14 @@ body * {
   --dsh-session-list-scrollbar-width: 8px !important;
 }
 
-/* The transcript's own padding, and the gap that follows an assistant
-   response, both come from classes rather than tokens. */
+/* The transcript's own padding comes from a class rather than a token. */
 body [class*="_scroll"]:has(> [class*="_column"]) {
   padding: 12px 16px;
 }
 
-body [class*="_flowItem"] {
+/* DSH applies its rhythm with a following-sibling combinator so the first item
+   gets no leading gap; mirror that rather than giving every item a top margin. */
+body [class*="_flowItem"] ~ [class*="_flowItem"] {
   margin-top: var(--cct-flow-gap);
 }
 
@@ -214,22 +215,30 @@ body [data-chat-flow] [class*="_bubble"] {
 
 /* ================================================================== *
  * Transcript: markers
+ *
+ * `data-chat-flow-kind` carries the routed node's kind. The kinds below are
+ * the ones Claude Code has a glyph for; the rest of DSH's set (`compaction`,
+ * `turn-error`, `turn-trigger`, `system-prompt`, `unknown`, …) are harness
+ * notices with no Claude Code equivalent, so they are left unmarked rather
+ * than given a marker that would imply something they are not.
  * ================================================================== */
 
 body [data-chat-flow-kind="user"],
+body [data-chat-flow-kind="steering"],
 body [data-chat-flow-kind="assistant"],
+body [data-chat-flow-kind="assistant-step"],
 body [data-chat-flow-kind="tool-call"],
 body [data-chat-flow-kind="tool-result"],
 body [data-chat-flow-kind="reasoning"] {
   position: relative;
-  /* Reserve the marker gutter on the row itself. These rows are virtualized
-     and their inner structure belongs to the chat package; horizontal padding
-     cannot change a row's measured height, so this is safe under
-     virtualization. */
+  /* Reserve the marker gutter on the row itself. Horizontal padding cannot
+     change a row's measured height, which matters because several rows are
+     size-contained or fixed-height. */
   padding-left: var(--cct-marker-gutter);
 }
 
-body [data-chat-flow-kind="user"]::before {
+body [data-chat-flow-kind="user"]::before,
+body [data-chat-flow-kind="steering"]::before {
   content: var(--cct-marker-user);
   position: absolute;
   left: 2px;
@@ -243,6 +252,7 @@ body [data-chat-flow-kind="user"]::before {
 }
 
 body [data-chat-flow-kind="assistant"]::before,
+body [data-chat-flow-kind="assistant-step"]::before,
 body [data-chat-flow-kind="tool-call"]::before {
   content: var(--cct-marker-assistant);
   position: absolute;
@@ -254,7 +264,8 @@ body [data-chat-flow-kind="tool-call"]::before {
   user-select: none;
 }
 
-body [data-chat-flow-kind="assistant"]::before {
+body [data-chat-flow-kind="assistant"]::before,
+body [data-chat-flow-kind="assistant-step"]::before {
   color: var(--dsw-alias-label-secondary);
 }
 

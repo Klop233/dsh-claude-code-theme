@@ -4,21 +4,30 @@
 
 **把 Claude Code 的视觉语言搬到 DeepSeek Harness Web GUI。**
 
-暖纸质中性色、赤陶色强调色、`>` / `⏺` / `⎿` / `✻` 的对话标记语法，以及以等宽字体为主的排版 ——
+暖纸质中性色、赤陶色强调色、`>` 提示符后的等宽对话正文、方正的圆角几何，
+以及 Claude Code 的 `⏺` / `⎿` / `✻` 标记 ——
 全部通过 DSH 自身的主题扩展点生效，不修改它的样式表。
 
 [![npm](https://img.shields.io/npm/v/dsh-claude-code-theme.svg)](https://www.npmjs.com/package/dsh-claude-code-theme)
 [![license](https://img.shields.io/npm/l/dsh-claude-code-theme.svg)](./LICENSE)
 
+</div>
+
+## 改造前后
+
+原版 DSH —— 右对齐的圆角气泡、无衬线正文、12–28px 的柔和圆角，
+以及一个悬浮输入卡片配圆形发送按钮：
+
+<img src="./docs/assets/before-dark.png" alt="原版 DSH 会话界面" width="880">
+
+应用主题后 —— 左对齐的 `>` 提示符配等宽正文，工具调用与它的 `⎿` 输出，
+思考过程是赤陶色的 `✻`，输入框变成带状态行的方正细边框盒子：
+
 <img src="./docs/assets/preview-dark.png" alt="深色会话中的主题效果" width="880">
 
-<sub>深色。用户输入带 `>` 提示符，已完成的工具调用是绿色 `⏺`，其输出是 `⎿`，思考过程是赤陶色 `✻`。</sub>
+浅色模式，Claude 的米白画布配白色浮起卡片：
 
 <img src="./docs/assets/preview-light.png" alt="浅色会话中的主题效果" width="880">
-
-<sub>浅色。Claude 的米白画布，配白色浮起卡片。</sub>
-
-</div>
 
 ---
 
@@ -50,20 +59,47 @@ dsh plugin install dsh-claude-code-theme
 | `--dsw-alias-*` | 组件消费的语义角色 | 固定那些 Claude 有意与 DSH 不同的角色：白色卡片下的米白画布、赤陶色主按钮与焦点环、暖色细线。 |
 | `--dsw-specific-*` | 具名表面 | 调整侧边栏、输入框、消息块、菜单与代码表面。 |
 
-**对话标记语法。** Claude Code 的终端标记，通过伪元素挂在 DSH 公开的稳定
-`data-*` 钩子上：
+**几何。** DSH 把 **280 条 `border-radius` 声明收敛在六个 `--dsw-radius-*` 令牌**上
+（统计自全部 179 个已发布的 UI bundle），所以主题直接改这套比例尺：
 
-| 标记 | 节点 | 含义 |
+| 令牌 | DSH | 主题 |
 | --- | --- | --- |
-| `>` | `[data-chat-flow-kind="user"]` | 你的输入 |
-| `⏺` | `[data-chat-flow-kind="assistant"]` | 助手发言 |
-| `⏺` | `[data-chat-flow-kind="tool-call"]` | 已完成的工具调用 |
-| `⎿` | `[data-chat-flow-kind="tool-result"]` | 该调用的输出 |
-| `✻` | `[data-chat-flow-kind="reasoning"]` | 思考过程 |
-| `✻` | `[data-chat-running]` | 运行中，标记缓慢旋转 |
+| `--dsw-radius-xs` | 4px | 2px |
+| `--dsw-radius-sm` | 8px | 3px |
+| `--dsw-radius-md` | 12px | 4px |
+| `--dsw-radius-lg` | 16px | 6px |
+| `--dsw-radius-xl` | 20px | 8px |
+| `--dsw-radius-panel` | 28px | 8px |
 
-**排版与几何。** 代码、工具输出与 diff 使用 Claude Code 的等宽字体栈；圆角收紧到
-Claude 的 6 px；标题去掉 DSH 额外的字距；滚动条变为细暖色轨道。
+剩下 177 条绕过比例尺的圆角，通过匹配 CSS Module 类名中**语义的那一半**
+（`[class*="_card" i]`、`[class*="_dialog" i]` …）来收口，而不是匹配构建哈希。
+本来就该是圆形的形状 —— 圆点、头像、缩略图、加载环 —— 被有意排除在外。
+
+**紧凑度。** DSH 把布局尺度声明为 `--dsh-*` 自定义属性，其中一些就声明在消费它的那一行上，
+因此主题在整个子树上重新声明了节奏：对话块间距从 6/12px 统一收敛到 6px，
+输入框的 stack gap、dock inset 与左右留白一并收紧，侧边栏内边距从 12px 降到 8px。
+行高、面板内边距和侧边栏自身的尺度也按同一档收紧。
+
+**对话正文。** 这才是实质性的改动，而不是重新配色：
+
+| | DSH | 主题 |
+| --- | --- | --- |
+| 字体 | 无衬线比例字体 | **等宽**，像终端程序那样渲染 |
+| 你的消息 | 右对齐、带底色的圆角气泡 | **左对齐纯文本**，前面是 `>` 提示符，没有容器 |
+| 助手发言 | 纯文本 | `⏺` 标记 |
+| 工具调用 | 带图标的一行 | Claude Code 的绿色 `⏺` —— 一次已完成的动作 |
+| 工具输出 | 浮起卡片 | `⎿` 标记配扁平等宽卡片 |
+| 思考过程 | 折叠摘要 | 赤陶色 `✻`，斜体 |
+| 运行中 | 微光文字 | `✻` 缓慢旋转 |
+| 代码块 | 圆角卡片 | 细边框，语言横幅改为大写 |
+
+**输入框。** DSH 的是一个 28px 圆角的悬浮卡片，它的细线其实来自高度阴影环，
+发送按钮还是圆的。主题把它改成方正的盒子：真正的 1px 边框替换掉阴影环与柔和投影，
+内部加 `>` 提示符，控制行变成用细线分隔的等宽状态行。
+提示符、编辑器与占位符是**一起**移动的，因为占位符是相对卡片绝对定位、
+并锚定在编辑器原本的内边距盒上的。
+
+**外围界面。** 侧边栏标签、会话标题、会话行与版本文本改为等宽；滚动条变成细的方形轨道。
 
 ## 自定义
 
@@ -77,8 +113,12 @@ body {
   --cct-marker-gutter: 26px;
 
   /* 更方正，像终端那样。 */
-  --cct-radius: 4px;
-  --cct-radius-lg: 6px;
+  --cct-radius: 2px;
+  --cct-radius-sm: 0px;
+
+  /* 比 Claude Code 默认更宽松的正文。 */
+  --cct-flow-gap: 10px;
+  --cct-transcript-size: 14px;
 
   /* 或者干脆去掉对话标记。 */
   --cct-marker-assistant: "";
@@ -88,15 +128,20 @@ body {
 
 | 变量 | 默认值 | 用途 |
 | --- | --- | --- |
-| `--cct-marker-user` | `">"` | 你的消息上的提示符 |
+| `--cct-marker-user` | `">"` | 你的消息上的提示符，输入框内同样使用 |
 | `--cct-marker-assistant` | `"●"` | 助手消息上的标记 |
 | `--cct-marker-tool` | `"●"` | 工具调用上的标记 |
 | `--cct-marker-result` | `"⎿"` | 工具输出上的标记 |
 | `--cct-marker-reasoning` | `"✻"` | 思考过程与运行中状态上的标记 |
-| `--cct-marker-gutter` | `22px` | 为标记预留的左侧留白 |
-| `--cct-radius` | `6px` | 标准圆角 |
-| `--cct-radius-sm` | `4px` | 紧凑圆角（行内代码） |
-| `--cct-radius-lg` | `10px` | 宽松圆角 |
+| `--cct-marker-gutter` | `20px` | 为标记预留的左侧留白 |
+| `--cct-prompt-inset` | `10px` | 输入框提示符距盒子左边缘的距离 |
+| `--cct-radius` | `4px` | 标准圆角 |
+| `--cct-radius-sm` | `2px` | 紧凑圆角（行、chip、行内代码） |
+| `--cct-radius-lg` | `6px` | 宽松圆角 |
+| `--cct-flow-gap` | `6px` | 对话块之间的间距 |
+| `--cct-flow-gap-response` | `10px` | 助手回答之后的间距 |
+| `--cct-transcript-size` | `13px` | 正文文字大小 |
+| `--cct-transcript-leading` | `1.55` | 正文行高 |
 | `--cct-mono` | DSH 的代码字体栈 | 等宽字体 |
 
 想改颜色，就再叠一层自己的覆盖 —— 后叠的层按令牌逐个生效：
