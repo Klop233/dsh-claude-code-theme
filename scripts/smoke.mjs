@@ -177,6 +177,33 @@ for (const name of required) {
   check(name in tokens, `overrides ${name}`)
 }
 
+// The shared corner scale is what squares the whole application: six tokens
+// carry 280 of DSH's border-radius declarations, so a regression here is a
+// regression everywhere. The shipped scale is 4/8/12/16/20/28px.
+const RADIUS_SCALE = {
+  '--dsw-radius-xs': 4,
+  '--dsw-radius-sm': 8,
+  '--dsw-radius-md': 12,
+  '--dsw-radius-lg': 16,
+  '--dsw-radius-xl': 20,
+  '--dsw-radius-panel': 28,
+}
+for (const [name, shipped] of Object.entries(RADIUS_SCALE)) {
+  const value = tokens[name]?.dark ?? ''
+  const px = Number.parseInt(value, 10)
+  check(
+    Number.isFinite(px) && px < shipped,
+    `${name} is tightened below DSH's ${shipped}px (${value})`,
+  )
+}
+
+// The ramp retint is what carries the recolour, since the alias tier resolves
+// through it. A missing ramp step would silently leave blue-tinted greys.
+const RAMP_STEPS = ['00', '50', '75', '100', '150', '300', '500', '700', '850', '900', '950', '1000']
+for (const step of RAMP_STEPS) {
+  check(`--dsw-static-neutral-bluish-${step}` in tokens, `retints the warm ramp step ${step}`)
+}
+
 console.log('\nstylesheet')
 check(appended.length === 1, `exactly one style tag appended (${appended.length})`)
 const tag = appended[0]
@@ -205,7 +232,7 @@ for (const char of css) {
 }
 check(!unbalanced && depth === 0, `stylesheet braces balance (depth ${depth})`)
 
-for (const needle of ['--cct-marker-user', 'data-chat-flow-kind', 'data-composer-card']) {
+for (const needle of ['--cct-marker-user', 'data-chat-flow-kind', 'data-composer-seat', '[class*="_bubble"']) {
   check(css.includes(needle), `stylesheet targets ${needle}`)
 }
 

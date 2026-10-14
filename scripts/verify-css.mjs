@@ -75,10 +75,12 @@ console.log('\ndsh token references')
  * typo that would silently drop the declaration.
  */
 const KNOWN_DSH_TOKENS = new Set([
+  '--dsw-alias-bg-base',
   '--dsw-alias-bg-document-selection',
   '--dsw-alias-border-l1',
   '--dsw-alias-border-l2',
   '--dsw-alias-brand-primary',
+  '--dsw-alias-label-primary',
   '--dsw-alias-label-secondary',
   '--dsw-alias-label-tertiary',
   '--dsw-alias-state-success-primary',

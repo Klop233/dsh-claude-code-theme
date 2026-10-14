@@ -153,6 +153,21 @@ npm run build   # lib/index.js + lib/client.js
 `window.__ModuleLoader__.load`，对着桩 DOM 运行 —— 并断言覆盖表是良构的
 `{ light, dark }` 对，且销毁时会撤回两处注册。
 
+### 发布
+
+`prepublishOnly` 会跑完整测试，因此不可能发布出一个连自身测试都过不了的包：
+
+```sh
+npm login          # 每台机器一次
+npm publish        # 类型检查 -> 构建 -> verify:css -> smoke -> 上传
+```
+
+只想预览将要上传的内容而不真正发布：
+
+```sh
+npm pack --dry-run
+```
+
 ## 许可
 
 [MIT](./LICENSE)

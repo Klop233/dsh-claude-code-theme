@@ -328,8 +328,28 @@ const TYPOGRAPHY_TOKENS: TokenTable = {
 }
 
 /**
+ * Geometry: Claude Code's corner scale.
+ *
+ * DSH routes 280 `border-radius` declarations through these six tokens
+ * (measured across all 179 shipped UI bundles), so re-pointing them squares
+ * the whole application coherently. DSH's scale is consumer-app soft —
+ * 4/8/12/16/20/28px; Claude Code is terminal-adjacent and sits at 2/3/4/6/8px.
+ *
+ * The values are identical in both colour schemes, but `overrideTokens`
+ * requires a pair, so each is repeated.
+ */
+const RADIUS_TOKENS: TokenTable = {
+  '--dsw-radius-xs': pair('2px', '2px'),
+  '--dsw-radius-sm': pair('3px', '3px'),
+  '--dsw-radius-md': pair('4px', '4px'),
+  '--dsw-radius-lg': pair('6px', '6px'),
+  '--dsw-radius-xl': pair('8px', '8px'),
+  '--dsw-radius-panel': pair('8px', '8px'),
+}
+
+/**
  * The complete override layer, in the order it reads best: ramps first (they
- * carry the bulk of the recolour), then semantic roles, then typography.
+ * carry the bulk of the recolour), then semantic roles, then geometry.
  */
 export const CLAUDE_CODE_TOKENS: TokenTable = {
   ...WARM_RAMP,
@@ -340,6 +360,7 @@ export const CLAUDE_CODE_TOKENS: TokenTable = {
   ...WARN_RAMP,
   ...INK_RAMP,
   ...ROLE_TOKENS,
+  ...RADIUS_TOKENS,
   ...TYPOGRAPHY_TOKENS,
 }
 

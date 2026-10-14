@@ -1,38 +1,37 @@
 /**
  * dsh-claude-code-theme — component layer.
  *
- * The palette layer (see `palette.ts`) handles colour through DSH's token
- * system. This sheet handles everything tokens cannot express: Claude Code's
- * transcript grammar (`>` input, `⏺` action, `⎿` result, `✻` thinking), its
- * compact mono-forward typography, and its tighter corner geometry.
+ * The palette layer (`palette.ts`) recolours through DSH's design tokens. This
+ * sheet does the things tokens cannot express: Claude Code's transcript
+ * grammar, its mono-forward typography, its square geometry, and its density.
  *
  * ## Targeting
  *
- * Selectors use the stable `data-*` hooks DSH's own components publish
- * (`data-chat-flow-kind`, `data-composer-seat`, `data-code-block-banner`, …),
- * never the hashed CSS-module class names — those are build artefacts and
- * change between releases, while the attributes are the components' own
- * contract.
+ * DSH's own class names are CSS-module hashes (`cJsG2q_bubble`), so the local
+ * half after the hash is stable across releases while the hash is not. Rules
+ * therefore match on the local name with `[class*="_local"]`, scoped by the
+ * `data-*` hooks the components publish so a generic local like `_row` cannot
+ * leak into another region.
  *
- * Rules are written as `body [data-…]` rather than bare `[data-…]`: the extra
- * body step wins the cascade against the components' single-class rules
- * regardless of injection order, so the theme does not depend on being the
- * last stylesheet in `<head>`.
+ * Every rule is written as `body <scope> <target>`: the extra `body` step wins
+ * the cascade against a component's single-class rule regardless of injection
+ * order, so the theme does not depend on being the last stylesheet in `<head>`,
+ * and no rule needs `!important` to be seen.
  *
  * ## Customisation
  *
- * Every glyph, radius and metric reads a `--cct-*` custom property declared
- * once on `body` below. Override any of them from user CSS to retune the theme
- * without patching the package:
+ * Every glyph, radius, metric and density value reads a `--cct-*` property
+ * declared once on `body` below. Retune the theme from user CSS without
+ * patching the package:
  *
  * ```css
- * body { --cct-marker-user: "❯"; --cct-radius: 10px; }
+ * body { --cct-marker-user: "❯"; --cct-flow-gap: 8px; --cct-radius: 2px; }
  * ```
  */
 
-/* ------------------------------------------------------------------ *
+/* ================================================================== *
  * Theme knobs
- * ------------------------------------------------------------------ */
+ * ================================================================== */
 
 body {
   /* Transcript markers — Claude Code's terminal grammar. */
@@ -42,149 +41,248 @@ body {
   --cct-marker-tool: "\25CF"; /* ● */
   --cct-marker-result: "\23BF"; /* ⎿ */
 
-  /* Geometry: Claude Code is terminal-adjacent, so corners stay tight. */
-  --cct-radius: 6px;
-  --cct-radius-sm: 4px;
-  --cct-radius-lg: 10px;
+  /* Geometry. Claude Code is terminal-adjacent, so corners stay tight. */
+  --cct-radius: 4px;
+  --cct-radius-sm: 2px;
+  --cct-radius-lg: 6px;
 
-  /* Metric overrides keep the transcript dense the way a TUI is dense. */
-  --cct-marker-gutter: 22px;
+  /* Density. Claude Code packs a transcript far tighter than a chat app. */
+  --cct-flow-gap: 6px;
+  --cct-flow-gap-response: 10px;
+  --cct-marker-gutter: 20px;
+  --cct-prompt-inset: 10px;
+  --cct-transcript-size: 13px;
+  --cct-transcript-leading: 1.55;
+
   --cct-mono: var(--ds-font-family-code, ui-monospace, SFMono-Regular, Menlo, monospace);
 }
 
-/* ------------------------------------------------------------------ *
- * Typography
- * ------------------------------------------------------------------ */
-
-/* Claude Code renders code, tool output and diffs in its mono face. */
-body code,
-body kbd,
-body samp,
-body pre,
-body [data-code-block-banner],
-body [class*="_code"] {
-  font-family: var(--cct-mono);
-  font-variant-ligatures: contextual;
-}
-
-/* Tighten Markdown headings: DSH's defaults are roomier than Claude's. */
-body h1,
-body h2,
-body h3,
-body h4 {
-  letter-spacing: -0.011em;
-}
-
-body h1 {
-  letter-spacing: -0.019em;
-}
-
-/* Inline code reads as a warm chip, not a grey box. */
-body :not(pre) > code {
-  border-radius: var(--cct-radius-sm);
-  padding: 0.12em 0.34em;
-  font-size: 0.92em;
-}
-
-/* ------------------------------------------------------------------ *
+/* ================================================================== *
  * Corner geometry
- * ------------------------------------------------------------------ */
+ *
+ * DSH routes 280 corners through six `--dsw-radius-*` tokens, which the
+ * palette layer re-points at Claude's tighter scale. The rules below catch the
+ * 177 declarations that bypass the scale, matching on the semantic half of the
+ * local name so a content hash never appears. Matching is case-insensitive
+ * because locals are camelCase (`newButton`, `iconButton`, `openButton`).
+ *
+ * Shapes that are *meant* to be round — `_dot`, `_avatar`, `_thumb`,
+ * `_pending`, `_spinner`, `_ring`, `_separator` — are deliberately absent.
+ * Squaring them would not tighten the theme, it would break it.
+ * ================================================================== */
 
-body [data-composer-card],
-body [data-code-block-banner],
-body [data-menu-material],
-body [data-disclosure-row] {
+body [class*="_card" i],
+body [class*="_panel" i],
+body [class*="_dialog" i],
+body [class*="_modal" i],
+body [class*="_menu" i],
+body [class*="_popover" i],
+body [class*="_surface" i],
+body [class*="_sheet" i],
+body [class*="_tile" i],
+body [class*="_banner" i],
+body [class*="_block" i],
+body [class*="_dropdown" i],
+body [class*="_tooltip" i],
+body [class*="_toast" i],
+body [class*="_well" i] {
   border-radius: var(--cct-radius);
 }
 
-/* ------------------------------------------------------------------ *
- * Transcript: user input
- *
- * Claude Code shows what you typed behind a `>` prompt on a quiet block
- * rather than a saturated bubble. The bubble keeps its warm fill but gains
- * the prompt marker and a leading rule.
- * ------------------------------------------------------------------ */
-
-body [data-chat-flow-kind="user"] {
-  position: relative;
+/* Rows, cells and controls take the tighter step. */
+body [class*="_row" i],
+body [class*="_item" i],
+body [class*="_cell" i],
+body [class*="_chip" i],
+body [class*="_tag" i],
+body [class*="_badge" i],
+body [class*="_notice" i],
+body [class*="_option" i],
+body [class*="_field" i],
+body [class*="_input" i],
+body [class*="_trigger" i],
+body [class*="_segment" i],
+body [class*="_tab" i],
+body [class*="_button" i],
+body [class*="_btn" i],
+body [class*="_list" i],
+body [class*="_stepper" i],
+body [class*="_face" i],
+body [class*="_rule" i],
+body [class*="_session" i],
+body [class*="_label" i] {
+  border-radius: var(--cct-radius-sm);
 }
 
-body [data-chat-flow-kind="user"]::before {
-  content: var(--cct-marker-user);
-  position: absolute;
-  left: 4px;
-  top: 0.16em;
+/* ================================================================== *
+ * Density
+ *
+ * DSH declares its layout metrics as `--dsh-*` custom properties, several of
+ * them on the very rows that consume them, so a value set on `body` alone
+ * would be shadowed. Re-declaring across the subtree is the only way to make
+ * the rhythm uniform — and a custom property is cheap enough to do it.
+ * ================================================================== */
+
+body,
+body * {
+  --dsh-chat-flow-gap: var(--cct-flow-gap) !important;
+  --dsh-composer-stack-gap: 4px !important;
+  --dsh-composer-dock-inset: 6px !important;
+  --dsh-composer-side-clearance: 8px !important;
+  --dsh-sidebar-inline-padding: 8px !important;
+  --dsh-windows-content-radius: var(--cct-radius) !important;
+  --dsh-scrollbar-width: 8px !important;
+  --dsh-session-list-scrollbar-width: 8px !important;
+}
+
+/* The transcript's own padding, and the gap that follows an assistant
+   response, both come from classes rather than tokens. */
+body [class*="_scroll"]:has(> [class*="_column"]) {
+  padding: 12px 16px;
+}
+
+body [class*="_flowItem"] {
+  margin-top: var(--cct-flow-gap);
+}
+
+/* ================================================================== *
+ * Typography
+ *
+ * Claude Code is a terminal program: the transcript is monospace. This is the
+ * single strongest signal of the style, so it applies to the whole flow, not
+ * just to code.
+ * ================================================================== */
+
+body [data-chat-flow],
+body [data-chat-flow] * {
   font-family: var(--cct-mono);
-  font-size: 0.95em;
-  font-weight: 600;
-  line-height: 1.5;
-  color: var(--dsw-alias-brand-primary);
-  pointer-events: none;
-  user-select: none;
 }
 
-/* ------------------------------------------------------------------ *
- * Transcript: assistant actions and tool calls
- *
- * `⏺` opens an action, `⎿` hangs a result beneath it — the two-glyph
- * structure that makes a Claude Code transcript scannable.
- * ------------------------------------------------------------------ */
+body [data-chat-flow] {
+  font-size: var(--cct-transcript-size);
+  line-height: var(--cct-transcript-leading);
+}
 
+/* Markdown keeps its hierarchy, but on the mono rhythm. */
+body [class*="_body"] h1,
+body [class*="_body"] h2,
+body [class*="_body"] h3,
+body [class*="_body"] h4 {
+  letter-spacing: -0.01em;
+  margin-block: 0.7em 0.35em;
+}
+
+body [class*="_body"] p {
+  margin-block: 0.45em;
+}
+
+body [class*="_body"] ul,
+body [class*="_body"] ol {
+  margin-block: 0.45em;
+  padding-inline-start: 1.5em;
+}
+
+body [class*="_body"] li {
+  margin-block: 0.15em;
+}
+
+/* ================================================================== *
+ * Transcript: the user's turn
+ *
+ * DSH renders the user's message as a right-aligned rounded bubble. Claude
+ * Code renders it as plaintext behind a `>` prompt on the canvas — same
+ * alignment as everything else, no container, no fill.
+ * ================================================================== */
+
+body [data-chat-flow] [class*="_userRow"] {
+  align-items: flex-start;
+}
+
+body [data-chat-flow] [class*="_userStack"] {
+  align-items: flex-start;
+  max-width: 100%;
+  gap: 2px;
+}
+
+body [data-chat-flow] [class*="_bubble"] {
+  background: transparent;
+  border-radius: 0;
+  padding: 0;
+  color: var(--dsw-alias-label-primary);
+  white-space: pre-wrap;
+}
+
+/* ================================================================== *
+ * Transcript: markers
+ * ================================================================== */
+
+body [data-chat-flow-kind="user"],
 body [data-chat-flow-kind="assistant"],
 body [data-chat-flow-kind="tool-call"],
 body [data-chat-flow-kind="tool-result"],
 body [data-chat-flow-kind="reasoning"] {
   position: relative;
+  /* Reserve the marker gutter on the row itself. These rows are virtualized
+     and their inner structure belongs to the chat package; horizontal padding
+     cannot change a row's measured height, so this is safe under
+     virtualization. */
+  padding-left: var(--cct-marker-gutter);
+}
+
+body [data-chat-flow-kind="user"]::before {
+  content: var(--cct-marker-user);
+  position: absolute;
+  left: 2px;
+  top: 0;
+  color: var(--dsw-alias-brand-primary);
+  font-family: var(--cct-mono);
+  font-weight: 700;
+  line-height: var(--cct-transcript-leading);
+  pointer-events: none;
+  user-select: none;
+}
+
+body [data-chat-flow-kind="assistant"]::before,
+body [data-chat-flow-kind="tool-call"]::before {
+  content: var(--cct-marker-assistant);
+  position: absolute;
+  left: 3px;
+  top: 0;
+  font-size: 0.62em;
+  line-height: 2.5;
+  pointer-events: none;
+  user-select: none;
 }
 
 body [data-chat-flow-kind="assistant"]::before {
-  content: var(--cct-marker-assistant);
-  position: absolute;
-  left: 2px;
-  top: 0.2em;
-  font-size: 0.7em;
-  line-height: 2;
   color: var(--dsw-alias-label-secondary);
-  pointer-events: none;
-  user-select: none;
 }
 
-/* A tool call is an *action that completed*, so it takes the success dot —
-   the one place Claude Code spends green. */
+/* A tool call is an action that completed — the one place Claude Code spends
+   green. */
 body [data-chat-flow-kind="tool-call"]::before {
-  content: var(--cct-marker-tool);
-  position: absolute;
-  left: 2px;
-  top: 0.2em;
-  font-size: 0.7em;
-  line-height: 2;
   color: var(--dsw-alias-state-success-primary);
-  pointer-events: none;
-  user-select: none;
 }
 
 body [data-chat-flow-kind="tool-result"]::before {
   content: var(--cct-marker-result);
   position: absolute;
   left: 2px;
-  top: 0.1em;
-  font-family: var(--cct-mono);
-  font-size: 0.9em;
-  line-height: 1.6;
+  top: 0;
   color: var(--dsw-alias-label-tertiary);
+  font-family: var(--cct-mono);
+  line-height: var(--cct-transcript-leading);
   pointer-events: none;
   user-select: none;
 }
 
-/* Thinking reads as Claude Code's shimmering `✻` aside. */
 body [data-chat-flow-kind="reasoning"]::before {
   content: var(--cct-marker-reasoning);
   position: absolute;
   left: 2px;
-  top: 0.14em;
-  font-size: 0.9em;
-  line-height: 1.6;
+  top: 0;
   color: var(--dsw-alias-brand-primary);
+  line-height: var(--cct-transcript-leading);
   pointer-events: none;
   user-select: none;
 }
@@ -194,11 +292,10 @@ body [data-chat-flow-kind="reasoning"] {
   font-style: italic;
 }
 
-/* The running line gets the same marker treatment so the live state reads
-   as a Claude Code activity row rather than a plain label. */
+/* The working line gets the same marker, turning slowly. */
 body [data-chat-running]::before {
   content: var(--cct-marker-reasoning);
-  margin-right: 0.45em;
+  margin-right: 0.5em;
   color: var(--dsw-alias-brand-primary);
   animation: cct-spin 2.4s linear infinite;
 }
@@ -213,88 +310,244 @@ body [data-chat-running]::before {
   }
 }
 
-/* Reserve the marker gutter on the node itself rather than on its first child:
-   these rows are virtualized, and their inner structure is the chat package's
-   business. Horizontal padding cannot change a row's measured height, so this
-   stays safe under virtualization while keeping markers clear of the text. */
-body [data-chat-flow-kind="user"],
-body [data-chat-flow-kind="assistant"],
-body [data-chat-flow-kind="tool-call"],
-body [data-chat-flow-kind="tool-result"],
-body [data-chat-flow-kind="reasoning"] {
-  padding-left: var(--cct-marker-gutter);
-}
-
-/* Honour reduced-motion: the marker keeps its shape, drops the spin. */
 @media (prefers-reduced-motion: reduce) {
   body [data-chat-running]::before {
     animation: none;
   }
 }
 
-/* ------------------------------------------------------------------ *
- * Code blocks
- * ------------------------------------------------------------------ */
+/* ================================================================== *
+ * Tool rows
+ *
+ * Claude Code reads `⏺ Read(path)` on one line with the output hanging under
+ * it. The row is compacted and the result card loses its elevation.
+ * ================================================================== */
 
-body [data-code-block-banner] {
+body [class*="_ioCard"] {
+  border-radius: var(--cct-radius-sm);
+  box-shadow: none;
   font-family: var(--cct-mono);
-  font-size: 11px;
-  letter-spacing: 0.02em;
-  text-transform: lowercase;
+  font-size: 12px;
+}
+
+body [class*="_ioLabel"] {
+  font-family: var(--cct-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dsw-alias-label-tertiary);
+}
+
+/* ================================================================== *
+ * Code blocks and tables
+ * ================================================================== */
+
+/* The banner is a label, not the code: uppercase it only when it is the small
+   caption element, so a container carrying the attribute cannot mangle the
+   code inside it. */
+body [class*="_banner"] {
+  font-family: var(--cct-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dsw-alias-label-tertiary);
 }
 
 body pre {
-  border-radius: var(--cct-radius);
+  border-radius: var(--cct-radius-sm);
   border: 1px solid var(--dsw-alias-border-l1);
 }
 
-/* ------------------------------------------------------------------ *
- * Composer
- * ------------------------------------------------------------------ */
-
-body [data-composer-card] {
-  border: 1px solid var(--dsw-alias-border-l2);
-  box-shadow: none;
+body :not(pre) > code {
+  border-radius: var(--cct-radius-sm);
+  padding: 0.1em 0.3em;
+  font-size: 0.94em;
 }
 
-/* Claude's composer rests on a hairline and only lights up on focus. */
-body [data-composer-seat]:focus-within [data-composer-card] {
+body table {
+  font-size: 12px;
+}
+
+body th {
+  font-family: var(--cct-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--dsw-alias-label-tertiary);
+}
+
+/* ================================================================== *
+ * Composer
+ *
+ * DSH's composer is a 28px-radius floating card with a soft shadow, a sans
+ * editor, a circular add button and a circular send button. Claude Code's
+ * input is a square, hairline-bordered box with a `>` prompt and a quiet
+ * status line beneath it.
+ * ================================================================== */
+
+body [data-composer-seat] [class*="_card"] {
+  position: relative;
+  background: var(--dsw-alias-bg-base);
+  /* DSH draws the card's hairline as an elevation ring rather than a border,
+     so the ring is dropped and a real border put in its place. */
+  border: 1px solid var(--dsw-alias-border-l2);
+  border-radius: var(--cct-radius);
+  box-shadow: none;
+  /* The card's own horizontal padding is zero by design: the left gutter
+     belongs to the editor, which is shifted below along with the placeholder
+     it is pinned to. */
+  padding: 6px 0 0;
+  gap: 4px;
+}
+
+body [data-composer-seat]:focus-within [class*="_card"] {
   border-color: var(--dsw-alias-brand-primary);
 }
 
-body [data-composer-input] {
-  font-family: var(--dsw-font-family);
+/* The prompt glyph sits inside the box, ahead of the editor. */
+body [data-composer-seat] [class*="_card"]::before {
+  content: var(--cct-marker-user);
+  position: absolute;
+  left: var(--cct-prompt-inset);
+  top: 9px;
+  color: var(--dsw-alias-brand-primary);
+  font-family: var(--cct-mono);
+  font-weight: 700;
+  line-height: 1.5;
+  pointer-events: none;
+  user-select: none;
 }
 
-/* ------------------------------------------------------------------ *
- * Selection, scrollbars, focus
- * ------------------------------------------------------------------ */
+/* The editor and the placeholder must move together: the placeholder is
+   absolutely positioned against the card and pinned to the editor's original
+   padding box, and it has to stay the editor's immediate next sibling. */
+body [data-composer-seat] [class*="_input"] {
+  padding-left: calc(var(--cct-prompt-inset) + var(--cct-marker-gutter));
+  font-family: var(--cct-mono);
+  font-size: var(--cct-transcript-size);
+  line-height: 1.5;
+}
+
+body [data-composer-seat] [class*="_placeholder"] {
+  inset: 4px 8px auto calc(var(--cct-prompt-inset) + var(--cct-marker-gutter));
+  font-family: var(--cct-mono);
+}
+
+/* The controls row becomes a status line: mono, quiet, ruled off. Its 8px
+   inline padding is kept — the card has none of its own, and the row is also
+   the container that drives DSH's own `@container` query. */
+body [data-composer-seat] [class*="_row"] {
+  border-top: 1px solid var(--dsw-alias-border-l1);
+  padding: 6px 8px 4px;
+  gap: 8px;
+  font-family: var(--cct-mono);
+  font-size: 11px;
+}
+
+/* Square controls: DSH rounds the add and send buttons into circles. Only the
+   corner changes — the send button's 34px box and its optical transform are
+   load-bearing. */
+body [data-composer-seat] [class*="_add"],
+body [data-composer-seat] [class*="_primary"],
+body [data-composer-seat] [class*="_select"] {
+  border-radius: var(--cct-radius-sm);
+}
+
+body [data-composer-seat] [class*="_select"] {
+  font-family: var(--cct-mono);
+  font-size: 11px;
+}
+
+body [data-composer-seat] [class*="_notice"] {
+  border-radius: var(--cct-radius-sm);
+  font-family: var(--cct-mono);
+  font-size: 11px;
+}
+
+/* ================================================================== *
+ * Sidebar and header chrome
+ *
+ * Claude Code is a terminal, so the chrome around the transcript reads as
+ * terminal too: mono labels, compact rows, no decorative rounding.
+ * ================================================================== */
+
+body [class*="_brandName"],
+body [class*="_localBuildBrand"],
+body [class*="_buildVersion"],
+body [class*="_panelTitle"],
+body [class*="_newSession"],
+body [class*="_titleCluster"],
+body [class*="_crumbs"],
+body [class*="_entry"],
+body [class*="_fieldValue"] {
+  font-family: var(--cct-mono);
+}
+
+body [class*="_brandName"] {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+body [class*="_titleCluster"] {
+  font-size: 13px;
+}
+
+body [class*="_newSession"] {
+  border-radius: var(--cct-radius);
+  font-size: 12px;
+}
+
+body [class*="_panelRow"] {
+  border-radius: var(--cct-radius-sm);
+  padding-block: 3px;
+  font-size: 12px;
+}
+
+body [class*="_panelTitle"] {
+  font-size: 12px;
+}
+
+body [class*="_buildVersion"] {
+  font-size: 10px;
+  opacity: 0.7;
+}
+
+/* Session and workspace list rows: DSH gives these an 8px corner. */
+body [class*="_nav"],
+body [class*="_cell"] {
+  border-radius: var(--cct-radius-sm);
+  font-size: 12px;
+}
+
+body [class*="_logoRow"],
+body [class*="_topStrip"] {
+  padding-block: 4px;
+}
+
+/* ================================================================== *
+ * Selection and scrollbars
+ * ================================================================== */
 
 body ::selection {
   background: var(--dsw-alias-bg-document-selection);
 }
 
-/* DSH owns the scrollbar contract through these tokens; the warm ramp
-   already recolours them, so only the geometry needs a nudge. */
 body ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
 }
 
 body ::-webkit-scrollbar-thumb {
-  border-radius: 999px;
-  border: 3px solid transparent;
+  border-radius: 0;
+  border: 2px solid transparent;
   background-clip: content-box;
 }
 
-/* ------------------------------------------------------------------ *
- * Brand mark
- * ------------------------------------------------------------------ */
+/* ================================================================== *
+ * Brand
+ * ================================================================== */
 
-/* Claude Code's welcome mark is the terracotta asterisk. DSH paints its
-   own brand glyph from the brand package; give it Claude's colour so the
-   product chrome matches the theme instead of fighting it. */
-body [data-conversation-header-leading] svg,
-body [data-conversation-header-corner] svg {
+body [data-conversation-header-leading] svg {
   color: var(--dsw-alias-brand-primary);
 }
