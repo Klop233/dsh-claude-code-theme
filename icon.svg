@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="dsh-claude-code-theme">
+  <title>dsh-claude-code-theme</title>
+  <rect width="64" height="64" rx="14" fill="#1f1e1d"/>
+  <!-- Claude Code's asterisk mark: eight tapered rays around a warm core. -->
+  <g fill="#d97757" transform="translate(32 32)">
+    <rect x="-2.6" y="-19" width="5.2" height="38" rx="2.6"/>
+    <rect x="-2.6" y="-19" width="5.2" height="38" rx="2.6" transform="rotate(45)"/>
+    <rect x="-2.6" y="-19" width="5.2" height="38" rx="2.6" transform="rotate(90)"/>
+    <rect x="-2.6" y="-19" width="5.2" height="38" rx="2.6" transform="rotate(135)"/>
+  </g>
+  <circle cx="32" cy="32" r="4.6" fill="#faf9f5"/>
+</svg>

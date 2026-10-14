@@ -1,0 +1,10 @@
+# The dsh-claude-code-theme bundle patch.
+#
+# One row: the host half of the plugin. It is intentionally inert — every
+# visual change ships in the browser half (`lib/client.js`), which the web app
+# loads because package.json declares `dsh.client`. The row exists so the
+# plugin is a first-class loader entry: the profile's own cordis.patch.yml can
+# retune its config, and `--patch` overlays can disable it by id.
+- insert:
+    - id: claude-code-theme
+      name: dsh-claude-code-theme

@@ -1,0 +1,92 @@
+{
+  "name": "dsh-claude-code-theme",
+  "version": "0.1.0",
+  "description": "Claude Code visual theme for the DeepSeek Harness Web GUI — warm paper palette, terracotta accent, Claude Code transcript markers and mono-forward typography.",
+  "type": "module",
+  "license": "MIT",
+  "author": "Klop233",
+  "icon": "icon.svg",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Klop233/dsh-claude-code-theme.git"
+  },
+  "homepage": "https://github.com/Klop233/dsh-claude-code-theme",
+  "bugs": {
+    "url": "https://github.com/Klop233/dsh-claude-code-theme/issues"
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "default": "./lib/index.js"
+    },
+    "./client": "./lib/client.js",
+    "./palette": {
+      "types": "./lib/client/palette.d.ts",
+      "default": "./lib/client/palette.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "icon.svg",
+    "lib/index.js",
+    "lib/index.d.ts",
+    "lib/client.js",
+    "lib/client",
+    "cordis.patch.yml",
+    "README.md",
+    "README.zh.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "inject": [
+        "@deepseek-ai/dsh-client-ui-theme"
+      ],
+      "platform": "web"
+    },
+    "compatibility": {
+      "dshReleases": {
+        "0.2.0-rc.2": "compatible"
+      }
+    }
+  },
+  "scripts": {
+    "build": "tsc && tsdown",
+    "typecheck": "tsc --noEmit",
+    "smoke": "node scripts/smoke.mjs",
+    "verify:css": "node scripts/verify-css.mjs",
+    "test": "npm run typecheck && npm run build && npm run verify:css && npm run smoke",
+    "prepublishOnly": "npm test"
+  },
+  "keywords": [
+    "deepseek-harness",
+    "dsh",
+    "dsh-plugin",
+    "cordis",
+    "theme",
+    "claude-code",
+    "anthropic",
+    "web-ui",
+    "dark-mode",
+    "design-tokens"
+  ],
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "^4.0.1"
+  },
+  "devDependencies": {
+    "@deepseek-ai/cordis": "^4.0.1",
+    "@types/node": "^22.0.0",
+    "lightningcss": "^1.33.0",
+    "tsdown": "^0.22.2",
+    "typescript": "^5.9.0"
+  }
+}
