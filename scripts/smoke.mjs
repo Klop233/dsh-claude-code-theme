@@ -177,23 +177,22 @@ for (const name of required) {
   check(name in tokens, `overrides ${name}`)
 }
 
-// The shared corner scale is what squares the whole application: six tokens
-// carry 280 of DSH's border-radius declarations, so a regression here is a
-// regression everywhere. The shipped scale is 4/8/12/16/20/28px.
+// The shared corner scale carries 280 of DSH's border-radius declarations, so
+// a regression here is a regression everywhere. Desktop uses 4/6/8/12/16/20px.
 const RADIUS_SCALE = {
   '--dsw-radius-xs': 4,
-  '--dsw-radius-sm': 8,
-  '--dsw-radius-md': 12,
-  '--dsw-radius-lg': 16,
-  '--dsw-radius-xl': 20,
-  '--dsw-radius-panel': 28,
+  '--dsw-radius-sm': 6,
+  '--dsw-radius-md': 8,
+  '--dsw-radius-lg': 12,
+  '--dsw-radius-xl': 16,
+  '--dsw-radius-panel': 20,
 }
-for (const [name, shipped] of Object.entries(RADIUS_SCALE)) {
+for (const [name, expected] of Object.entries(RADIUS_SCALE)) {
   const value = tokens[name]?.dark ?? ''
   const px = Number.parseInt(value, 10)
   check(
-    Number.isFinite(px) && px < shipped,
-    `${name} is tightened below DSH's ${shipped}px (${value})`,
+    Number.isFinite(px) && px === expected,
+    `${name} uses the Desktop scale (${expected}px, ${value})`,
   )
 }
 
@@ -232,7 +231,7 @@ for (const char of css) {
 }
 check(!unbalanced && depth === 0, `stylesheet braces balance (depth ${depth})`)
 
-for (const needle of ['--cct-marker-user', 'data-chat-flow-kind', 'data-composer-seat', '[class*="_bubble"']) {
+for (const needle of ['--cct-composer-radius', 'data-chat-flow-kind', 'data-composer-card', '[data-slot="sidebar"]']) {
   check(css.includes(needle), `stylesheet targets ${needle}`)
 }
 

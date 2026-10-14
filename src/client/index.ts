@@ -82,8 +82,8 @@ function mountStylesheet(): () => void {
 }
 
 /**
- * Client plugin body: stack the Claude Code token layer over the active
- * palette and publish the component stylesheet.
+ * Client plugin body: stack the Desktop token layer over the active palette
+ * and publish the component stylesheet.
  * @param ctx - the client root context.
  */
 export function apply(ctx: Context): void {

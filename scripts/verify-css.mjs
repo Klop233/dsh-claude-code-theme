@@ -77,14 +77,21 @@ console.log('\ndsh token references')
 const KNOWN_DSH_TOKENS = new Set([
   '--dsw-alias-bg-base',
   '--dsw-alias-bg-document-selection',
+  '--dsw-alias-bg-layer-1',
   '--dsw-alias-border-l1',
   '--dsw-alias-border-l2',
   '--dsw-alias-brand-primary',
+  '--dsw-alias-interactive-bg-hover',
+  '--dsw-alias-label-caption',
   '--dsw-alias-label-primary',
   '--dsw-alias-label-secondary',
   '--dsw-alias-label-tertiary',
+  '--dsw-alias-markdown-code-block',
   '--dsw-alias-state-success-primary',
   '--dsw-font-family',
+  '--dsw-specific-bubble',
+  '--dsw-specific-input-major',
+  '--dsw-specific-sidebar-nav-item-hover',
   '--ds-font-family-code',
 ])
 

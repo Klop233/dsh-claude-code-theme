@@ -12,14 +12,14 @@
  *
  * Because the alias tier resolves through `var(--dsw-static-*)`, retinting the
  * ramps re-colours nearly the whole application coherently. This module
- * therefore does two things:
+ * therefore does three things:
  *
  * - **Retints the ramps** from DSH's blue-tinted greys and DeepSeek blue to
  *   Claude's warm paper greys and terracotta.
  * - **Pins the semantically load-bearing aliases** so roles Claude treats
- *   differently from DSH (a cream canvas under white cards, a terracotta focus
- *   ring and primary button, a sidebar lighter than the transcript) land
- *   exactly rather than by accident of ramp arithmetic.
+ *   differently from DSH (cream canvas under raised cards, terracotta focus
+ *   ring and primary button, warm hairlines) land consistently.
+ * - **Re-points the radius scale** for a desktop product surface: 4/6/8/12/16/20px.
  *
  * Every value is a `{ light, dark }` pair because that is the shape
  * `ctx.theme.overrideTokens()` requires — it validates the pair at runtime and
@@ -196,13 +196,13 @@ const ROLE_TOKENS: TokenTable = {
   // --- Surfaces ---------------------------------------------------------
   // Claude sets a cream canvas with white raised cards; DSH paints both from
   // one ramp step, which would flatten the two into a single sheet.
-  '--dsw-alias-bg-base': pair('#faf9f5', '#1f1e1d'),
-  '--dsw-alias-bg-layer-1': pair('#ffffff', '#262624'),
-  '--dsw-alias-bg-layer-2': pair('#ffffff', '#2b2a28'),
-  '--dsw-alias-bg-layer-3': pair('#ffffff', '#31302d'),
-  '--dsw-alias-bg-overlay': pair('#f5f3ec', '#31302d'),
-  '--dsw-alias-bg-module-platform': pair('#f5f3ec', '#393734'),
-  '--dsw-alias-bg-multi-select': pair('#f5f3ec', '#31302d'),
+  '--dsw-alias-bg-base': pair('#faf9f5', '#171716'),
+  '--dsw-alias-bg-layer-1': pair('#ffffff', '#1d1d1b'),
+  '--dsw-alias-bg-layer-2': pair('#ffffff', '#252422'),
+  '--dsw-alias-bg-layer-3': pair('#ffffff', '#2d2c2a'),
+  '--dsw-alias-bg-overlay': pair('#f5f3ec', '#292826'),
+  '--dsw-alias-bg-module-platform': pair('#f5f3ec', '#302f2c'),
+  '--dsw-alias-bg-multi-select': pair('#f5f3ec', '#292826'),
 
   // --- Hairlines --------------------------------------------------------
   // Warm-tinted alpha strokes: a neutral black hairline reads grey-blue over a
@@ -241,11 +241,11 @@ const ROLE_TOKENS: TokenTable = {
   '--dsw-alias-link': pair('#b0523a', '#e08a63'),
 
   // --- Text -------------------------------------------------------------
-  '--dsw-alias-label-primary': pair('#1f1e1d', '#faf9f5'),
-  '--dsw-alias-label-primary-dimmed': pair('#2b2a28', '#eae7dd'),
-  '--dsw-alias-label-secondary': pair('#6b6862', '#b8b4a8'),
-  '--dsw-alias-label-tertiary': pair('#8b8780', '#a5a199'),
-  '--dsw-alias-label-caption': pair('#a5a199', '#797670'),
+  '--dsw-alias-label-primary': pair('#1f1e1d', '#e8e5dd'),
+  '--dsw-alias-label-primary-dimmed': pair('#2b2a28', '#d6d1c7'),
+  '--dsw-alias-label-secondary': pair('#6b6862', '#aaa69d'),
+  '--dsw-alias-label-tertiary': pair('#8b8780', '#7e7a73'),
+  '--dsw-alias-label-caption': pair('#a5a199', '#6f6b64'),
   '--dsw-alias-label-dimmed': pair('#d2cec3', '#46443f'),
   '--dsw-alias-label-primary-foreground': pair('#faf9f5', '#1f1e1d'),
   '--dsw-alias-label-primary-inverted': pair('#ffffff', '#31302d'),
@@ -261,17 +261,17 @@ const ROLE_TOKENS: TokenTable = {
   '--dsw-alias-interactive-bg-hover-danger': pair('#c04a410d', '#e8837a26'),
 
   // --- Named surfaces ---------------------------------------------------
-  '--dsw-specific-bubble': pair('#f0eee6', '#2e2d2a'),
-  '--dsw-specific-bubble-highlight': pair('#e4e1d7', '#393734'),
-  '--dsw-specific-input-major': pair('#ffffff', '#2b2a28'),
-  '--dsw-specific-login-input': pair('#f8f7f3', '#262624'),
-  '--dsw-specific-menu': pair('#fffffff2', '#31302df2'),
-  '--dsw-specific-selector': pair('#f5f3ec', '#31302d'),
-  '--dsw-specific-sidebar-fill': pair('#f5f3ec', '#262624'),
-  '--dsw-specific-sidebar-nav-item-active': pair('#eae7dd', '#393734'),
+  '--dsw-specific-bubble': pair('#f0eee6', '#2a2927'),
+  '--dsw-specific-bubble-highlight': pair('#e4e1d7', '#343330'),
+  '--dsw-specific-input-major': pair('#ffffff', '#20201f'),
+  '--dsw-specific-login-input': pair('#f8f7f3', '#1d1d1b'),
+  '--dsw-specific-menu': pair('#fffffff2', '#292826f2'),
+  '--dsw-specific-selector': pair('#f5f3ec', '#292826'),
+  '--dsw-specific-sidebar-fill': pair('#f5f3ec', '#111110'),
+  '--dsw-specific-sidebar-nav-item-active': pair('#eae7dd', '#343330'),
   '--dsw-specific-sidebar-nav-item-active-accent': pair('#f9e3d7', '#45271b'),
-  '--dsw-specific-sidebar-nav-item-hover': pair('#f0eee6', '#31302d'),
-  '--dsw-specific-tip': pair('#f5f3ec', '#31302d'),
+  '--dsw-specific-sidebar-nav-item-hover': pair('#f0eee6', '#242321'),
+  '--dsw-specific-tip': pair('#f5f3ec', '#292826'),
 
   // --- Markdown ---------------------------------------------------------
   '--dsw-alias-markdown-code-block': pair('#f5f3ec', '#1a1918'),
@@ -328,23 +328,22 @@ const TYPOGRAPHY_TOKENS: TokenTable = {
 }
 
 /**
- * Geometry: Claude Code's corner scale.
+ * Geometry: Claude Desktop's corner scale.
  *
- * DSH routes 280 `border-radius` declarations through these six tokens
- * (measured across all 179 shipped UI bundles), so re-pointing them squares
- * the whole application coherently. DSH's scale is consumer-app soft —
- * 4/8/12/16/20/28px; Claude Code is terminal-adjacent and sits at 2/3/4/6/8px.
+ * DSH routes 280 `border-radius` declarations through these six tokens. Claude
+ * Desktop keeps a tactile product scale instead of terminal-square corners:
+ * 4/6/8/12/16/20px.
  *
  * The values are identical in both colour schemes, but `overrideTokens`
  * requires a pair, so each is repeated.
  */
 const RADIUS_TOKENS: TokenTable = {
-  '--dsw-radius-xs': pair('2px', '2px'),
-  '--dsw-radius-sm': pair('3px', '3px'),
-  '--dsw-radius-md': pair('4px', '4px'),
-  '--dsw-radius-lg': pair('6px', '6px'),
-  '--dsw-radius-xl': pair('8px', '8px'),
-  '--dsw-radius-panel': pair('8px', '8px'),
+  '--dsw-radius-xs': pair('4px', '4px'),
+  '--dsw-radius-sm': pair('6px', '6px'),
+  '--dsw-radius-md': pair('8px', '8px'),
+  '--dsw-radius-lg': pair('12px', '12px'),
+  '--dsw-radius-xl': pair('16px', '16px'),
+  '--dsw-radius-panel': pair('20px', '20px'),
 }
 
 /**
@@ -377,7 +376,7 @@ export const THEME_SOURCE = 'dsh-claude-code-theme'
 export const CLAUDE_ACCENT = '#d97757' as const
 
 /** Claude's warm dark canvas, exported for downstream consumers and docs. */
-export const CLAUDE_DARK_CANVAS = '#1f1e1d' as const
+export const CLAUDE_DARK_CANVAS = '#171716' as const
 
 /** Claude's cream light canvas, exported for downstream consumers and docs. */
 export const CLAUDE_LIGHT_CANVAS = '#faf9f5' as const

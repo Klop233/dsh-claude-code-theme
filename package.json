@@ -1,7 +1,7 @@
 {
   "name": "dsh-claude-code-theme",
   "version": "0.1.0",
-  "description": "Claude Code visual theme for the DeepSeek Harness Web GUI — warm paper palette, terracotta accent, Claude Code transcript markers and mono-forward typography.",
+  "description": "Claude Desktop visual theme for the DeepSeek Harness Web GUI — warm paper palette, terracotta accent, readable prose, quiet surfaces and a continuous composer.",
   "type": "module",
   "license": "MIT",
   "author": "Klop233",
@@ -73,7 +73,9 @@
     "dsh-plugin",
     "cordis",
     "theme",
+    "claude",
     "claude-code",
+    "claude-desktop",
     "anthropic",
     "web-ui",
     "dark-mode",
